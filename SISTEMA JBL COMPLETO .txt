@@ -1,0 +1,412 @@
+new EleTEmJbl[MAX_PLAYERS];
+#define MAX_JBL 30 //Máixmo de JBL's que podem está conectadas simultaneamente
+#define D_JBL 777 //ID da Dialog JBL
+
+enum JBL_Info
+{
+    Text3D:TextJBL[MAX_JBL],
+    JblUsed[MAX_JBL],
+    Float:xJBL[MAX_JBL],
+    Float:yJBL[MAX_JBL],
+    Float:zJBL[MAX_JBL],
+    StringMusica[100]
+};
+new InfoJBL[JBL_Info], JBL[MAX_PLAYERS], OuvindoMusica[MAX_PLAYERS];
+
+
+
+CMD:ligarjbl(playerid)
+{
+	 if(EleTEmJbl[playerid] == 1)
+	 {
+		 if(GetPlayerInterior(playerid) != 0)
+	     {
+		    return SendClientMessage(playerid, 0xFF4500FF, "| ERRO | Não é permitido usar esse comando em interiores");
+		 }
+	     if(IsPlayerInAnyVehicle(playerid))
+		 {
+			return SendClientMessage(playerid, 0xFF4500FF, "| ERRO | Você não pode usar esse comando em veículos");
+		 }
+		 if(JBL[playerid] > -1)
+		 {
+			return SendClientMessage(playerid, 0xFF4500FF, "| ERRO | Sua JBL já está ligada em algum lugar");
+		 }
+	 	 new stringj[1200];
+	      	strcat(stringj,"{FFFFFF}Musica 1\n");
+	      	strcat(stringj,"Musica 2\n");
+	      	strcat(stringj,"Musica 3\n");
+	      	strcat(stringj,"Musica 4\n");
+	      	strcat(stringj,"Musica 5\n");
+	      	strcat(stringj,"{FFFFFF}Musica 6\n");
+	      	strcat(stringj,"Musica 7\n");
+	      	strcat(stringj,"Musica 8\n");
+	      	strcat(stringj,"Musica 9\n");
+	      	strcat(stringj,"Musica 10\n");
+	      	strcat(stringj,"{FFFFFF}Musica 11\n");
+	      	strcat(stringj,"Musica 12\n");
+	      	strcat(stringj,"Musica 13\n");
+	      	strcat(stringj,"Musica 14\n");
+	      	strcat(stringj,"Musica 15\n");
+	      	strcat(stringj,"{FFFFFF}Musica 16\n");
+	      	strcat(stringj,"Musica 17\n");
+	      	strcat(stringj,"Musica 18\n");
+	      	strcat(stringj,"Musica 19\n");
+	      	strcat(stringj,"Musica 20\n");
+	      	strcat(stringj,"{FFFFFF}Musica 21\n");
+	      	strcat(stringj,"Musica 22\n");
+	      	strcat(stringj,"Musica 23\n");
+	      	strcat(stringj,"Musica 24\n");
+	      	strcat(stringj,"Musica 25\n");
+	      	strcat(stringj,"{FFFFFF}Musica 26\n");
+	      	strcat(stringj,"Musica 27\n");
+	      	strcat(stringj,"Musica 28\n");
+	      	strcat(stringj,"Musica 29\n");
+	        strcat(stringj,"Radio~Forro~Funk\n");
+	        strcat(stringj,"{FFFFFF}Dj Guuga = Casamento\n");
+	        strcat(stringj,"Matue = Kenny G\n");
+	        strcat(stringj,"Matue = Gorila Roxo\n");
+	        strcat(stringj,"Dj Lucas = Amor ou litrao\n");
+	        strcat(stringj,"Orochi =  Balao\n");
+	        strcat(stringj,"{FFFFFF}Dani russo =  Senta com Carinho\n");
+	        strcat(stringj,"Dz7 =  Hoje tem bailao, Mandela de verdade\n");
+	        strcat(stringj,"Dj Lucas =  Leticia Motoxista\n");
+	        strcat(stringj,"Caxa =  Voltei para a cachorrada,Voltei para a putaria\n");
+	        strcat(stringj,"Remix =  Carinha de inocente\n");
+	        strcat(stringj,"{FFFFFF}Brunos prado =  Escravos do po\n");
+	        strcat(stringj,"Dj Matt - D =  Pandora\n");
+	        strcat(stringj,"Dz7 =  Automotivo\n");
+	        strcat(stringj,"Dz7 =  Que, que foi ta doendo\n");
+	        strcat(stringj,"Remix =  Depois da Fuga\n");
+	        strcat(stringj,"{FFFFFF}Dz7 =  Automotivo Assobio\n");
+	        strcat(stringj,"TDT =  Tropa da turquia\n");
+	        strcat(stringj,"TDT =  Tropa da turquia 2");
+		 ShowPlayerDialog(playerid, D_JBL, DIALOG_STYLE_LIST, "{FFFF00}JBL Music", stringj, "Tocar", "Fechar");
+	 }
+	 return 1;
+}
+
+CMD:desligarjbl(playerid)
+{
+        if(EleTEmJbl[playerid] == 1)
+        {
+            if(JBL[playerid] == -1)
+            {
+                return SendClientMessage(playerid, 0xFF4500FF, "{FF0000}[ERRO]{FFFFFF} Você não ligou sua JBL");
+            }
+            for(new j; j < MAX_JBL; j++)
+            {
+                if(InfoJBL[JblUsed][j] == JBL[playerid])
+                {
+                    new Float:X, Float:Y, Float:Z; GetDynamicObjectPos(InfoJBL[JblUsed][j], X, Y, Z);
+                    if(IsPlayerInRangeOfPoint(playerid, 3.0, X, Y, Z))
+                    {
+                        SendClientMessage(playerid, 0xFFFF00FF, "| INFO | Você desligou sua JBL");
+                        DestroyDynamicObject(InfoJBL[JblUsed][j]);
+                        JBL[playerid] = -1;
+                        InfoJBL[JblUsed][j] = -1;
+                        DestroyDynamic3DTextLabel(InfoJBL[TextJBL][j]);
+                        InfoJBL[TextJBL][j] = CreateDynamic3DTextLabel("{FFFFFF}JBL", -1, -999.0, -98383.3, -9292.0, 10.0);//Text3D
+                        for(new i; i < MAX_PLAYERS; i++)
+                        {
+                            if(IsPlayerInRangeOfPoint(i, 20.0, X, Y, Z))
+                            {
+                                StopAudioStreamForPlayer(i);
+                                OuvindoMusica[i] = 0;
+                            }
+                        }
+                        return 1;
+                    }
+                    else
+                    {
+                        return SendClientMessage(playerid, 0xFF4500FF, "{FF0000}[ERRO]{FFFFFF} Você não está próximo da sua JBL");
+                    }
+                }
+            }
+            return SendClientMessage(playerid, 0xFF4500FF, "{FF0000}[ERRO]{FFFFFF} Sua JBL não foi encontrada");
+        }
+        else
+        {
+            return SendClientMessage(playerid, 0xFF4500FF, "{FF0000}[ERRO]{FFFFFF} Você não tem JBL");
+        }
+}
+CMD:pararjbl(playerid)
+{
+        if(EleTEmJbl[playerid] == 1)
+        {
+            SendClientMessage(playerid, 0xFFFF00FF, "| INFO | Você parou de ouvir musica da JBL");
+            OuvindoMusica[playerid] = 0;
+            StopAudioStreamForPlayer(playerid);
+            return 1;
+        }
+        else
+        {
+            return SendClientMessage(playerid, 0xFF4500FF, "{FF0000}[ERRO]{FFFFFF} Você não tem JBL");
+        }
+}
+
+
+//////public
+
+forward ChamadaJBL();
+public ChamadaJBL()
+{
+    for (new i = 0, g = GetPlayerPoolSize(); i <= g; i++)
+    {
+        if(IsPlayerConnected(i))
+        {
+            for(new j; j < MAX_JBL; j++)
+            {
+                if(InfoJBL[JblUsed][j] > -1)
+                {
+                    new Float:XB, Float:YB, Float:ZB; GetDynamicObjectPos(InfoJBL[JblUsed][j], XB, YB, ZB);
+                    if(IsPlayerInRangeOfPoint(i, 20.0, XB, YB, ZB) && OuvindoMusica[i] == 0)
+                    {
+                        PlayAudioStreamForPlayer(i, InfoJBL[StringMusica][j], XB, YB, ZB, 20.0, 1); OuvindoMusica[i] = 120;
+                        break;
+                    }
+                }
+            }
+            if(OuvindoMusica[i] > 0)
+            {
+                OuvindoMusica[i] --;
+            }
+         }
+    }
+    return 1;
+
+if(dialogid == D_JBL)
+    {
+        if(response)
+        {
+            for(new j; j < MAX_JBL; j++)
+            {
+                if(InfoJBL[JblUsed][j] > -1)
+                {
+                    new Float:XB, Float:YB, Float:ZB; GetDynamicObjectPos(InfoJBL[JblUsed][j], XB, YB, ZB);
+                    if(IsPlayerInRangeOfPoint(playerid, 20.0, XB, YB, ZB))
+                    {
+                        return SendClientMessage(playerid, 0xFF4500FF, "{FF0000}[ERRO]{FFFFFF} Já tem uma JBL tocando nesse local");
+                    }
+                }
+            }
+            for(new j; j < MAX_JBL; j++)
+            {
+                if(InfoJBL[JblUsed][j] == -1)
+                {
+                    new String1[128], Nome[MAX_PLAYER_NAME]; GetPlayerName(playerid, Nome, sizeof(Nome));
+		      		format(String1, sizeof(String1), "| JBL | O(A) Jogador(a) %s[%i] ligou sua JBL", Nome, playerid);
+		        	SendClientMessageToAll(0xFFFF00FF, String1);
+			        ApplyAnimation(playerid, "BOMBER", "BOM_Plant", 4.0, 0, 0, 0, 0, 0);
+			        GetPlayerPos(playerid, InfoJBL[xJBL][j], InfoJBL[yJBL][j], InfoJBL[zJBL][j]);
+					GetXYInFrontOfPlayer(playerid, InfoJBL[xJBL][j], InfoJBL[yJBL][j], 0.7);
+		   			JBL[playerid] = CreateDynamicObject(2226, InfoJBL[xJBL][j], InfoJBL[yJBL][j], InfoJBL[zJBL][j] - 0.9, 0.0, 0, 0);
+		   			InfoJBL[JblUsed][j] = JBL[playerid];
+					DestroyDynamic3DTextLabel(InfoJBL[TextJBL][j]);
+        			new strp[80]; format(strp, sizeof(strp), "{ffff00}JBL {33AA3}Ligada\n{c7c7c7}Dono:(a):{FFFFFF} %s[%d]", Nome, playerid);
+          			InfoJBL[TextJBL][j] = CreateDynamic3DTextLabel(strp, -1, InfoJBL[xJBL][j], InfoJBL[yJBL][j], InfoJBL[zJBL][j]-0.5, 10.0);
+          			Streamer_Update(playerid);
+		   			switch(listitem)
+                    {
+                        case 0:
+		         		{
+							format(InfoJBL[StringMusica][j], 100, "http://144.217.28.2/JBL/Musica01.mp3");
+		         		}
+		         		case 1:
+		         		{
+							format(InfoJBL[StringMusica][j], 100, "http://144.217.28.2/JBL/Musica02.mp3");
+		         		}
+		         		case 2:
+		         		{
+							format(InfoJBL[StringMusica][j], 100, "http://144.217.28.2/JBL/Musica03.mp3");
+		         		}
+		         		case 3:
+		         		{
+							format(InfoJBL[StringMusica][j], 100, "http://144.217.28.2/JBL/Musica04.mp3");
+		         		}
+		         		case 4:
+		         		{
+							format(InfoJBL[StringMusica][j], 100, "http://144.217.28.2/JBL/Musica05.mp3");
+		         		}
+		         		case 5:
+		         		{
+							format(InfoJBL[StringMusica][j], 100, "http://144.217.28.2/JBL/Musica06.mp3");
+		         		}
+		         		case 6:
+		         		{
+							format(InfoJBL[StringMusica][j], 100, "http://144.217.28.2/JBL/Musica07.mp3");
+		         		}
+		         		case 7:
+		         		{
+							format(InfoJBL[StringMusica][j], 100, "http://144.217.28.2/JBL/Musica08.mp3");
+		         		}
+		         		case 8:
+		         		{
+							format(InfoJBL[StringMusica][j], 100, "http://144.217.28.2/JBL/Musica09.mp3");
+		         		}
+		         		case 9:
+		         		{
+							format(InfoJBL[StringMusica][j], 100, "http://144.217.28.2/JBL/Musica10.mp3");
+		         		}
+		         		case 10:
+		         		{
+							format(InfoJBL[StringMusica][j], 100, "http://144.217.28.2/JBL/Musica11.mp3");
+		         		}
+		         		case 11:
+		         		{
+							format(InfoJBL[StringMusica][j], 100, "http://144.217.28.2/JBL/Musica12.mp3");
+		         		}
+		         		case 12:
+		         		{
+							format(InfoJBL[StringMusica][j], 100, "http://144.217.28.2/JBL/Musica13.mp3");
+		         		}
+		         		case 13:
+		         		{
+							format(InfoJBL[StringMusica][j], 100, "http://144.217.28.2/JBL/Musica14.mp3");
+		         		}
+		         		case 14:
+		         		{
+							format(InfoJBL[StringMusica][j], 100, "http://144.217.28.2/JBL/Musica15.mp3");
+		         		}
+		         		case 15:
+		         		{
+							format(InfoJBL[StringMusica][j], 100, "http://144.217.28.2/JBL/Musica16.mp3");
+		         		}
+		         		case 16:
+		         		{
+							format(InfoJBL[StringMusica][j], 100, "http://144.217.28.2/JBL/Musica17.mp3");
+		         		}
+		         		case 17:
+		         		{
+							format(InfoJBL[StringMusica][j], 100, "http://144.217.28.2/JBL/Musica18.mp3");
+		         		}
+		         		case 18:
+		         		{
+							format(InfoJBL[StringMusica][j], 100, "http://144.217.28.2/JBL/Musica19.mp3");
+		         		}
+		         		case 19:
+		         		{
+							format(InfoJBL[StringMusica][j], 100, "http://144.217.28.2/JBL/Musica20.mp3");
+		         		}
+		         		case 20:
+		         		{
+							format(InfoJBL[StringMusica][j], 100, "http://144.217.28.2/JBL/Musica21.mp3");
+		         		}
+		         		case 21:
+		         		{
+							format(InfoJBL[StringMusica][j], 100, "http://144.217.28.2/JBL/Musica22.mp3");
+		         		}
+		         		case 22:
+		         		{
+							format(InfoJBL[StringMusica][j], 100, "http://144.217.28.2/JBL/Musica23.mp3");
+		         		}
+						case 23:
+		         		{
+                            format(InfoJBL[StringMusica][j], 100, "http://144.217.28.2/JBL/Musica24.mp3");
+		         		}
+						case 24:
+		         		{
+							format(InfoJBL[StringMusica][j], 100, "http://144.217.28.2/JBL/Musica25.mp3");
+		         		}
+						case 25:
+		         		{
+							format(InfoJBL[StringMusica][j], 100, "http://144.217.28.2/JBL/Musica26.mp3");
+						}
+						case 26:
+		         		{
+							format(InfoJBL[StringMusica][j], 100, "http://144.217.28.2/JBL/Musica27.mp3");
+						}
+						case 27:
+		         		{
+							format(InfoJBL[StringMusica][j], 100, "http://144.217.28.2/JBL/Musica28.mp3");
+						}
+						case 28:
+		         		{
+							format(InfoJBL[StringMusica][j], 100, "http://144.217.28.2/JBL/Musica29.mp3");
+						}
+						case 29:
+		         		{
+							format(InfoJBL[StringMusica][j], 100, "http://node-04.zeno.fm/3bar6v4ecchvv.mp3?rj-ttl=5&rj-tok=AAABfj_LtZUAW13VJsxjbMGUug.mp3");
+                        }
+                        case 30:
+		         		{
+							format(InfoJBL[StringMusica][j], 100, "http://144.217.28.2/JBL/DJ%20GUUGA%20=%20CASAMENTO%20((DJGUUGA)).mp3");
+                        }
+                        case 31:
+		         		{
+							format(InfoJBL[StringMusica][j], 100, "http://144.217.28.2/JBL/Matuê%20-%20Kenny%20G.mp3");
+                        }
+                        case 32:
+		         		{
+							format(InfoJBL[StringMusica][j], 100, "144.217.28.2/JBL/Matuê - Gorilla Roxo.mp3");
+                        }
+                        case 33:
+		         		{
+							format(InfoJBL[StringMusica][j], 100, "http://144.217.28.2/JBL/AMOR%20OU%20O%20LITRÃO%20(REMIX%20FUNK)%20DJ%20LUCAS%20BEAT.mp3");
+                        }
+                        case 34:
+		         	    {
+							format(InfoJBL[StringMusica][j], 100, "http://144.217.28.2/JBL/Balão.mp3");
+                        }
+                        case 35:
+		         		{
+							format(InfoJBL[StringMusica][j], 100, "http://144.217.28.2/JBL/Musica80.mp3");
+                        }
+                        case 36:
+		         		{
+							format(InfoJBL[StringMusica][j], 100, "http://144.217.28.2/JBL/HOJE%20TEM%20BAILÃO%20É%20MANDELA%20DE%20VERDADE%20vs%20FAZ%20A%20POSE%20OLHA%20O%20FLASH%20(DJ%20Miller%20e%20DJ%20Bruninho%20PZS).mp3");
+                        }
+                        case 37:
+		         		{
+							format(InfoJBL[StringMusica][j], 100, "http://144.217.28.2/JBL/LETÍCIA%20-%20PRA%20ONDE%20VOCÊ%20VAI%20COM%20AQUELE%20MOTOTAXISTA%20(VERSÃO%20MAGRÃO)%20DJ%20LUCAS%20BEAT.mp3");
+                        }
+                        case 38:
+		         		{
+							format(InfoJBL[StringMusica][j], 100, "http://som.brasilplaygames.com.br/som/volteipracachorra.mp3");
+                        }
+                        case 39:
+		         		{
+							format(InfoJBL[StringMusica][j], 100, "http://som.brasilplaygames.com.br/som/temcarinhadeinocente.mp3");
+                        }
+                        case 40:
+		         		{
+							format(InfoJBL[StringMusica][j], 100, "http://som.brasilplaygames.com.br/som/sentanobugalu.mp3");
+                        }
+                        case 41:
+		         		{
+							format(InfoJBL[StringMusica][j], 100, "http://som.brasilplaygames.com.br/som/pandora.mp3");
+                        }
+                        case 42:
+		         		{
+							format(InfoJBL[StringMusica][j], 100, "http://som.brasilplaygames.com.br/som/DZ7AUTOMOTIVO.mp3");
+                        }
+                        case 43:
+		         		{
+							format(InfoJBL[StringMusica][j], 100, "http://som.brasilplaygames.com.br/som/Dicria.mp3");
+                        }
+                        case 44:
+		         		{
+							format(InfoJBL[StringMusica][j], 100, "http://som.brasilplaygames.com.br/som/Depoisdafuga.mp3");
+                        }
+                        case 45:
+		         		{
+							format(InfoJBL[StringMusica][j], 100, "http://som.brasilplaygames.com.br/som/zzzzzzzzautomotivo.mp3");
+                        }
+                        case 46:
+		         		{
+							format(InfoJBL[StringMusica][j], 100, "http://som.brasilplaygames.com.br/som/Zzzzzzzzzzzzzzzzzztd.mp3");
+                        }
+                        case 47:
+		         		{
+							format(InfoJBL[StringMusica][j], 100, "http://som.brasilplaygames.com.br/som/ZzzzzzzzzzzzzzzzzTd2.mp3");
+                        }
+                    }
+                    return 1;
+                }
+            }
+            return SendClientMessage(playerid, 0xFF4500FF, "{FF0000}[ERRO]{FFFFFF} Não é possivel colocar uma JBL pois já tem muitas JBL's ligadas no servidor");
+        }
+    }
+    if(dialogid == 8725)
+    {
+
+
